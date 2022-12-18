@@ -34,7 +34,7 @@ sign.post("/in", async (req, res) => {
     if (!pwd) throw new Error("please insert correct password")
 
     if (email && pwd) {
-      const searchUser = await user.findOne({ email })
+      const searchUser = await user.Db.findOne({ email })
 
       if (searchUser) {
         const comparePwd = await bcrypt.compare(pwd, searchUser.pwd)
@@ -45,7 +45,7 @@ sign.post("/in", async (req, res) => {
             email: searchUser.email
           }
           const accessToken = jwt.sign(payload, jwtSecretKey, { expiresIn })
-          await user.updateOne(searchUser._id, { token: accessToken })
+          await user.Db.updateOne({ _id: searchUser._id }, { token: accessToken })
 
           res.cookie("accessToken", accessToken, { httpOnly: true, maxAge })
           ResponseApi(req, res, 202, payload) // RESPONSE ALL OK
@@ -119,7 +119,7 @@ sign.post("/token", async (req, res) => {
     const accessToken = req.cookies.accessToken
 
     if (accessToken) {
-      const searchUser = await user.findOne({ token: accessToken })
+      const searchUser = await user.Db.findOne({ token: accessToken })
 
       if (searchUser) {
         jwt.verify(accessToken, jwtSecretKey, async (err, decode) => {
@@ -129,7 +129,7 @@ sign.post("/token", async (req, res) => {
             email: searchUser.email
           }
           const accessToken = jwt.sign(payload, jwtSecretKey, { expiresIn })
-          await user.updateOne(searchUser._id, { token: accessToken })
+          await user.Db.updateOne({ _id: searchUser._id }, { token: accessToken })
 
           res.cookie("accessToken", accessToken, { httpOnly: true, maxAge })
           ResponseApi(req, res, 202, payload) // RESPONSE ALL OK

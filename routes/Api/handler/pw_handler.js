@@ -51,10 +51,19 @@ const handler = {
   // FIND BY ID
   FindById: async (req, res) => {
     const { _id } = req.params
-    const data = await pw.Db.findById(_id, {
-      author: 0,
-      tag: 0
-    })
+    const data = await pw.Db.findOne(
+      {
+        author: {
+          name: req.body.authentication.name,
+          email: req.body.authentication.email
+        },
+        _id
+      },
+      {
+        author: 0,
+        tag: 0
+      }
+    )
 
     if (data) {
       ResponseApi(req, res, 200, data)
@@ -66,8 +75,14 @@ const handler = {
   Search: async (req, res) => {
     try {
       const { q } = req.query
-      const data = await pw.Db.find(
-        { $text: { $search: q } },
+      const data = await pw.Db.findOne(
+        {
+          author: {
+            name: req.body.authentication.name,
+            email: req.body.authentication.email
+          },
+          $text: { $search: q }
+        },
         {
           createAt: 1,
           "data.name": 1,
@@ -76,7 +91,11 @@ const handler = {
         }
       )
 
-      ResponseApi(req, res, 200, data)
+      if (data) {
+        ResponseApi(req, res, 200, data)
+      } else {
+        ResponseApi(req, res, 404)
+      }
     } catch (error) {
       ResponseApi(req, res, 500, {}, [error.message])
     }
@@ -92,9 +111,9 @@ const handler = {
         data: {
           name,
           email,
-          site,
+          site: site || null,
           pwd,
-          notes
+          notes: notes || null
         },
         tag: [name, email, site],
         tag2: tag.split("#").filter((x) => x !== ""),
@@ -120,11 +139,20 @@ const handler = {
   // DELETE
   Delete: async function (req, res) {
     const { _id } = req.params
-    const exists = await pw.Db.findById(_id, { data: 1, _id: 0 })
+    const exists = await pw.Db.findById(
+      {
+        author: {
+          name: req.body.authentication.name,
+          email: req.body.authentication.email
+        },
+        _id
+      },
+      { data: 1, _id: 0 }
+    )
 
     if (exists) {
       const deleted = await pw.Db.deleteOne({ _id })
-      log(JSON.stringify(exists.data), 'red')
+      log(JSON.stringify(exists.data), "red")
 
       ResponseApi(req, res, 202, deleted)
     } else {
@@ -135,23 +163,33 @@ const handler = {
   updateOne: async (req, res) => {
     const { _id } = req.params
     const { name, email, site, pwd, notes, tag } = req.body
+    const exists = await pw.Db.findOne(
+      {
+        author: {
+          name: req.body.authentication.name,
+          email: req.body.authentication.email
+        },
+        _id
+      },
+      { data: 1, _id: 0 }
+    )
 
     const updated = {
-      'data.name': name,
-      'data.email': email,
-      'data.site': site,
-      'data.pwd': pwd,
-      'data.notes': notes,
+      "data.name": name,
+      "data.email": email,
+      "data.site": site,
+      "data.pwd": pwd,
+      "data.notes": notes,
       tag2: tag ? tag.split("#").filter((x) => x !== "") : undefined,
       updateAt: Date.now()
     }
 
-    const data = await pw.Db.updateOne({ _id }, updated)
+    if (exists) {
+      const data = await pw.Db.updateOne({ _id }, updated)
 
-    if (data.modifiedCount > 0) {
       ResponseApi(req, res, 202, data)
     } else {
-      ResponseApi(req, res, 400, data)
+      ResponseApi(req, res, 404)
     }
   },
 
