@@ -5,9 +5,9 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "node app.js",
-    "startDev": "nodemon app.js",
-    "startProd": "pm2 start app.js"
+    "test": "node app.js",
+    "start": "nodemon app.js",
+    "build": "pm2 start app.js"
   },
   "nodemonConfig": {
     "ignore": [
@@ -27,11 +27,13 @@
     "express": "^4.18.1",
     "express-fileupload": "^1.4.0",
     "figlet": "^1.5.2",
+    "internal-ip": "^7.0.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mongoose": "^6.7.5",
-    "nanoid": "^4.0.0"
+    "nanoid": "^4.0.0",
+    "node-device-detector": "^2.0.10"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.45.0",

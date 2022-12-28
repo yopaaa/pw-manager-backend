@@ -27,13 +27,12 @@ pw.DbSchema.index({ tag: "text", tag2: "text" })
 const handler = {
   // READ ALL
   FindAll: async (req, res) => {
+    const { name, email } = req.body.authentication
+
     try {
       const dataa = await pw.Db.find(
         {
-          author: {
-            name: req.body.authentication.name,
-            email: req.body.authentication.email
-          }
+          author: { name, email }
         },
         {
           createAt: 1,
@@ -42,6 +41,7 @@ const handler = {
           "data.site": 1
         }
       )
+
       ResponseApi(req, res, 200, dataa)
     } catch (error) {
       ResponseApi(req, res, 500, {}, [error.message])
@@ -152,7 +152,7 @@ const handler = {
 
     if (exists) {
       const deleted = await pw.Db.deleteOne({ _id })
-      log(JSON.stringify(exists.data), "red")
+      log(JSON.stringify(exists.data), 200)
 
       ResponseApi(req, res, 202, deleted)
     } else {

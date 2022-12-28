@@ -11,10 +11,10 @@ mongoose
     useUnifiedTopology: true
   })
   .then(() => {
-    log("Connected to MongoDB")
+    log("Connected to MongoDB", 200)
   })
   .catch((err) => {
-    log(err)
+    log(err, 500)
   })
 mongoose.set("autoIndex", true)
 
@@ -24,8 +24,12 @@ class Database {
     const database = mongoose.model(collections, dbSchema)
     database.createCollection()
     database.listIndexes((err, result) => {
-      if (err)log(err, 'red')
-      log(`${collections} list indexes ${result.length}`)
+      if (err)log(err, 500)
+      log(`${collections} list indexes ${result.length}`, 200)
+    })
+    database.count((err, result) => {
+      if (err)log(err, 500)
+      log(`database ${collections} data count is = ${result}`, 200)
     })
 
     this.Db = database

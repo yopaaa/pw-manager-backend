@@ -9,7 +9,7 @@ const authentication = (req, res, next) => {
   const accessToken = req.cookies.accessToken
 
   if (!accessToken) {
-    ResponseApi(req, res, 401)
+    ResponseApi(req, res, 401, {}, ['token not found'])
   } else {
     try {
       jwt.verify(accessToken, jwtSecretKey, (err, decode) => {
@@ -22,7 +22,7 @@ const authentication = (req, res, next) => {
         next()
       })
     } catch (error) {
-      ResponseApi(req, res, 401)
+      ResponseApi(req, res, 401, {}, error.message)
     }
   }
 }

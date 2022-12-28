@@ -44,6 +44,10 @@ CORS=<YOUR_FRONTEND_END_POINT> // http://example.com
 
 JWT_SECRET_TOKEN=<YOUR_SECRET_TOKEN> // super-secret
 
+WHITE_LIST_CORS=<YOUR_FRONTEND_PATH>
+
+LOG_FILE_PATH=/path/to/dir/
+
 ```
 
 ## Usage
