@@ -23,6 +23,7 @@ const origin = function (origin, callback) {
     callback(new Error("Not allowed by CORS"), false)
   }
 }
+// const origin = '*'
 
 // -----------------------------MIDDLEWARE-----------------------------
 app.use(express.urlencoded({ extended: true }))
@@ -37,6 +38,10 @@ app.use("/sign", sign)
 
 app.all("/", async (req, res) => {
   ResponseApi(req, res, 200)
+})
+
+app.all("/ping", authentication, async (req, res) => {
+  res.send("pong")
 })
 
 // The default error handler

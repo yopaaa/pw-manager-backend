@@ -17,9 +17,7 @@ const pw = new Database("passwords", {
   author: {
     name: String,
     email: String
-  },
-  createAt: Number,
-  updateAt: Number
+  }
 })
 pw.DbSchema.index({ author: 1 })
 pw.DbSchema.index({ tag: "text", tag2: "text" })
@@ -120,9 +118,7 @@ const handler = {
         author: {
           name: req.body.authentication.name,
           email: req.body.authentication.email
-        },
-        createAt: Date.now(),
-        updateAt: Date.now()
+        }
       }
 
       if (name && email && pwd) {
@@ -180,8 +176,7 @@ const handler = {
       "data.site": site,
       "data.pwd": pwd,
       "data.notes": notes,
-      tag2: tag ? tag.split("#").filter((x) => x !== "") : undefined,
-      updateAt: Date.now()
+      tag2: tag ? tag.split("#").filter((x) => x !== "") : undefined
     }
 
     if (exists) {

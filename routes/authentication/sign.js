@@ -13,4 +13,6 @@ sign.delete("/out", SignHandler.signout)
 
 sign.post("/token", SignHandler.token)
 
+sign.post("/verify/:_id", SignHandler.verify)
+
 export default sign

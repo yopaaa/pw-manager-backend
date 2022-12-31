@@ -1,18 +1,17 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import { nanoid } from "nanoid"
 import "dotenv/config"
 import ResponseApi from "../../../js/api-response.js"
 import Database from "../../../js/dbMethod.js"
+import { sendVerifyEmail, verifyCode } from "./verify-email.js"
+import { nanoid } from "nanoid"
 
 const user = new Database("account", {
   _id: String,
   name: String,
   email: String,
   pwd: String,
-  token: String,
-  createAt: Number,
-  updateAt: Number
+  token: String
 })
 user.DbSchema.index({ name: 1 }, { unique: true })
 user.DbSchema.index({ email: 1 }, { unique: true })
@@ -70,30 +69,19 @@ const SignHandler = {
       if (!pwd) throw new Error("please insert correct password")
 
       if (name && email && pwd) {
-        const salt = await bcrypt.genSalt(10)
-        const hashPw = await bcrypt.hash(pwd, salt)
-        const payload = { name, email }
+        const existName = await user.Db.findOne({ name })
+        const existEmail = await user.Db.findOne({ email })
 
-        const accessToken = jwt.sign(payload, jwtSecretKey, { expiresIn })
-        await user.insertOne({
-          _id: nanoid(),
-          name,
-          email,
-          pwd: hashPw,
-          token: accessToken,
-          createAt: Date.now(),
-          updateAt: Date.now()
-        })
+        if (existName) throw new Error(`${name} already exists`)
+        if (existEmail) throw new Error(`${email} already exists`)
 
-        res.cookie("accessToken", accessToken, { httpOnly: true, maxAge })
-        res.cookie("name", payload.name, { maxAge, secure: true })
-        ResponseApi(req, res, 201, payload) // RESPONSE ALL OK
+        if (!existName && !existEmail) {
+          const verifyEmail = await sendVerifyEmail({ name, email, pwd })
+          ResponseApi(req, res, 201, verifyEmail) // RESPONSE ALL OK
+        }
       }
     } catch (error) {
-      let msg = [error.message]
-      if (error.code === 11000) {
-        msg = `${JSON.stringify(error.keyValue)} already exists`
-      }
+      const msg = [error.message]
       ResponseApi(req, res, 400, {}, msg) // RESPONSE
     }
   },
@@ -140,6 +128,37 @@ const SignHandler = {
       }
     } catch (error) {
       ResponseApi(req, res, 403, {}, [error.message]) // RESPONSE IF ERROR
+    }
+  },
+
+  verify: async (req, res) => {
+    const { _id } = req.params
+    const { code } = req.body
+    try {
+      if (_id === "undefined") throw new Error("_id is undefined")
+      if (!code) throw new Error("code is undefined")
+
+      if (_id && code) {
+        const isVerify = await verifyCode(_id, Number(code))
+
+        if (isVerify.status) {
+          const salt = await bcrypt.genSalt(10)
+          const hashPw = await bcrypt.hash(isVerify.data.pwd, salt)
+          await user.insertOne({
+            _id: nanoid(),
+            name: isVerify.data.name,
+            email: isVerify.data.email,
+            pwd: hashPw,
+            token: nanoid()
+          })
+
+          ResponseApi(req, res, 200) // RESPONSE ALL OK
+        } else {
+          throw new Error(isVerify.err)
+        }
+      }
+    } catch (error) {
+      ResponseApi(req, res, 400, {}, [error.message])
     }
   }
 }

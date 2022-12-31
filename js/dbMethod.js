@@ -2,7 +2,8 @@ import log from "./log.js"
 import mongoose from "mongoose"
 import "dotenv/config"
 
-const { MONGODB_USER_NAME, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DATABASE } = process.env
+const { MONGODB_USER_NAME, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DATABASE } =
+  process.env
 const mongoPath = `mongodb://${MONGODB_USER_NAME}:${MONGODB_PASSWORD}@${MONGODB_HOST}/${MONGODB_DATABASE}`
 
 mongoose
@@ -20,15 +21,18 @@ mongoose.set("autoIndex", true)
 
 class Database {
   constructor(collections = "", schema = { _id: String }, index = null) {
-    const dbSchema = new mongoose.Schema(schema)
+    const dbSchema = new mongoose.Schema(schema, {
+      timestamps: true
+    })
+
     const database = mongoose.model(collections, dbSchema)
     database.createCollection()
     database.listIndexes((err, result) => {
-      if (err)log(err, 500)
+      if (err) return log(err.message, 500)
       log(`${collections} list indexes ${result.length}`, 200)
     })
     database.count((err, result) => {
-      if (err)log(err, 500)
+      if (err) return log(err.message, 500)
       log(`database ${collections} data count is = ${result}`, 200)
     })
 
