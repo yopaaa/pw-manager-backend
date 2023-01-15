@@ -67,7 +67,7 @@ const status = {
 }
 
 function ResponseApi(req, res, code = 200, data = {}, error = []) {
-  const userName = req.body.authentication ? req.body.authentication.name : undefined
+  const _id = req.body.authentication ? req.body.authentication._id : undefined
   const { originalUrl, ip } = req
 
   const result = {
@@ -78,7 +78,7 @@ function ResponseApi(req, res, code = 200, data = {}, error = []) {
     ip: req.ip
   }
 
-  log(`user ${userName || ip} access "${originalUrl}", ${error || ''}`, code, req.method)
+  log(`user ${_id || ip} access "${originalUrl}", ${error || ''}`, code, req.method)
   res.type("application/json").status(code).send(result)
 }
 

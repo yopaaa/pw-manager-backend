@@ -3,28 +3,43 @@ import bcrypt from "bcrypt"
 import "dotenv/config"
 import ResponseApi from "../../../js/api-response.js"
 import Database from "../../../js/dbMethod.js"
-import { sendVerifyEmail, verifyCode } from "./verify-email.js"
+import { sendVerifyEmail, verifyCode } from "../controller/verify-email.js"
 import { nanoid } from "nanoid"
+import NodeDeviceDecector from "node-device-detector"
 
 const user = new Database("account", {
   _id: String,
-  name: String,
-  email: String,
+  name: {
+    type: String,
+    maxLength: 100,
+    index: true,
+    unique: true
+  },
+  email: {
+    type: String,
+    maxLength: 100,
+    index: true,
+    unique: true
+  },
   pwd: String,
-  token: String
+  device: {}
 })
-user.DbSchema.index({ name: 1 }, { unique: true })
-user.DbSchema.index({ email: 1 }, { unique: true })
-user.DbSchema.index({ token: 1 }, { unique: true })
 
 const jwtSecretKey = process.env.JWT_SECRET_TOKEN
-const maxAge = 60 * 60 * 1000
-const expiresIn = "1h"
+const jwtSignToken = process.env.JWT_SIGN_TOKEN
+const maxAge = 5 * 60 * 60 * 1000
+const expiresIn = Date.now() + maxAge / 1000
+const DeviceDetector = new NodeDeviceDecector({
+  clientIndexes: true,
+  deviceIndexes: true,
+  deviceAliasCode: false
+})
 
 const SignHandler = {
   signin: async (req, res) => {
     try {
       const { email, pwd } = req.body
+      const device = DeviceDetector.detect(req.get("user-agent"))
       if (!email) throw new Error("please insert correct emails")
       if (!pwd) throw new Error("please insert correct password")
 
@@ -36,18 +51,13 @@ const SignHandler = {
 
           if (comparePwd) {
             const payload = {
-              name: searchUser.name,
-              email: searchUser.email
+              _id: searchUser._id
             }
             const accessToken = jwt.sign(payload, jwtSecretKey, { expiresIn })
-            await user.Db.updateOne(
-              { _id: searchUser._id },
-              { token: accessToken }
-            )
+            await user.Db.updateOne({ _id: payload._id }, { device })
 
             res.cookie("accessToken", accessToken, { httpOnly: true, maxAge })
-            res.cookie("name", payload.name, { maxAge, secure: true })
-            ResponseApi(req, res, 202, payload)
+            ResponseApi(req, res, 202)
           } else {
             throw new Error("passwword incorrect")
           }
@@ -76,8 +86,18 @@ const SignHandler = {
         if (existEmail) throw new Error(`${email} already exists`)
 
         if (!existName && !existEmail) {
-          const verifyEmail = await sendVerifyEmail({ name, email, pwd })
-          ResponseApi(req, res, 201, verifyEmail) // RESPONSE ALL OK
+          const { _id, expiresIn } = await sendVerifyEmail({ name, email, pwd })
+          const accessToken = jwt.sign({ _id }, jwtSignToken, {
+            expiresIn: `${expiresIn}s`
+          })
+
+          res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            maxAge: expiresIn * 1000
+          })
+          ResponseApi(req, res, 201, {
+            expiresIn: `${expiresIn}s`
+          }) // RESPONSE ALL OK
         }
       }
     } catch (error) {
@@ -89,76 +109,59 @@ const SignHandler = {
   signout: async (req, res) => {
     const accessToken = req.cookies.accessToken
     if (accessToken) {
-      res.clearCookie("accessToken")
-      res.clearCookie("name")
-      ResponseApi(req, res, 200)
+      jwt.verify(accessToken, jwtSecretKey, async (err, decode) => {
+        if (err) ResponseApi(req, res, 204)
+        await user.Db.updateOne(
+          {
+            _id: decode._id
+          },
+          {
+            device: {}
+          }
+        )
+        res.clearCookie("accessToken")
+        res.clearCookie("session")
+        ResponseApi(req, res, 200)
+      })
     } else {
       ResponseApi(req, res, 204)
     }
   },
 
-  token: async (req, res) => {
-    try {
-      const accessToken = req.cookies.accessToken
-
-      if (accessToken) {
-        const searchUser = await user.Db.findOne({ token: accessToken })
-
-        if (searchUser) {
-          jwt.verify(accessToken, jwtSecretKey, async (err, decode) => {
-            if (err) throw new Error(err.message)
-            const payload = {
-              name: searchUser.name,
-              email: searchUser.email
-            }
-            const accessToken = jwt.sign(payload, jwtSecretKey, { expiresIn })
-            await user.Db.updateOne(
-              { _id: searchUser._id },
-              { token: accessToken }
-            )
-
-            res.cookie("accessToken", accessToken, { httpOnly: true, maxAge })
-            ResponseApi(req, res, 202, payload) // RESPONSE ALL OK
-          })
-        } else {
-          throw new Error("not found please login")
-        }
-      } else {
-        throw new Error("please re login")
-      }
-    } catch (error) {
-      ResponseApi(req, res, 403, {}, [error.message]) // RESPONSE IF ERROR
-    }
-  },
-
   verify: async (req, res) => {
-    const { _id } = req.params
+    const accessToken = req.cookies.accessToken
     const { code } = req.body
-    try {
-      if (_id === "undefined") throw new Error("_id is undefined")
+
+    if (!accessToken) {
+      ResponseApi(req, res, 403, {}, ["token not found"])
+    } else {
       if (!code) throw new Error("code is undefined")
 
-      if (_id && code) {
-        const isVerify = await verifyCode(_id, Number(code))
+      jwt.verify(accessToken, jwtSignToken, async (err, decode) => {
+        try {
+          if (err) throw new Error(err.message)
+          const { _id } = decode
+          const isVerify = await verifyCode(_id, Number(code))
 
-        if (isVerify.status) {
-          const salt = await bcrypt.genSalt(10)
-          const hashPw = await bcrypt.hash(isVerify.data.pwd, salt)
-          await user.insertOne({
-            _id: nanoid(),
-            name: isVerify.data.name,
-            email: isVerify.data.email,
-            pwd: hashPw,
-            token: nanoid()
-          })
+          if (isVerify.status) {
+            const salt = await bcrypt.genSalt(10)
+            const hashPw = await bcrypt.hash(isVerify.data.pwd, salt)
+            await user.insertOne({
+              _id: nanoid(),
+              name: isVerify.data.name,
+              email: isVerify.data.email,
+              pwd: hashPw,
+              device: {}
+            })
 
-          ResponseApi(req, res, 200) // RESPONSE ALL OK
-        } else {
-          throw new Error(isVerify.err)
+            ResponseApi(req, res, 200) // RESPONSE ALL OK
+          } else {
+            throw new Error(isVerify.err)
+          }
+        } catch (error) {
+          ResponseApi(req, res, 401, {}, error.message)
         }
-      }
-    } catch (error) {
-      ResponseApi(req, res, 400, {}, [error.message])
+      })
     }
   }
 }

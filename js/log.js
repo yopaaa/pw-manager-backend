@@ -8,7 +8,7 @@ const logFilePath = process.env.LOG_FILE_PATH
 function log(text, code = 200, method = "NULL") {
   const time = moment().format()
   let color, bgColor
-  if (code >= 400 && code < 500) {
+  if (code >= 400 && code < 500 || method == 'DELETE') {
     color = "yellow"
     bgColor = "bgYellow"
   } else if (code >= 500 && code < 600) {

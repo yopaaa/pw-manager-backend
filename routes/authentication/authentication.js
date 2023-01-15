@@ -16,8 +16,7 @@ const authentication = (req, res, next) => {
         if (err) throw new Error(err.message)
 
         req.body.authentication = {
-          name: decode.name,
-          email: decode.email
+          _id: decode._id || 'anonymous'
         }
         next()
       })

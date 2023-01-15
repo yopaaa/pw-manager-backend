@@ -11,8 +11,6 @@ sign.post("/up", SignHandler.signup)
 
 sign.delete("/out", SignHandler.signout)
 
-sign.post("/token", SignHandler.token)
-
-sign.post("/verify/:_id", SignHandler.verify)
+sign.post("/verify", SignHandler.verify)
 
 export default sign

@@ -3,7 +3,7 @@ import DB from "../../../js/dbMethod.js"
 import nodemailer from "nodemailer"
 import "dotenv/config"
 import log from "../../../js/log.js"
-import emailTemplate from './emailTemplate.js'
+import emailTemplate from "../view/emailTemplate.js"
 
 const mailTransporter = nodemailer.createTransport(
   {
@@ -48,9 +48,10 @@ async function sendVerifyEmail(data) {
   await Database.insertOne({ _id, code, data })
   mailTransporter.sendMail(mailMessage(email, code), (error, info) => {
     if (error) log(error.message)
+    log(`email send to ${email} succesfully`)
   })
 
-  return { _id, expireIn: expireAfterSeconds }
+  return { _id, expiresIn: expireAfterSeconds }
 }
 
 async function verifyCode(_id, code) {
@@ -70,4 +71,19 @@ async function verifyCode(_id, code) {
   }
 }
 
-export { sendVerifyEmail, verifyCode }
+async function reSendVerifyEmail(_id) {
+  try {
+    const code = Math.floor(Math.random() * (999999 - 100000) + 100000)
+    const exists = await Database.Db.findByIdAndUpdate(_id, { code })
+
+    mailTransporter.sendMail(mailMessage(exists.email, code), (error, info) => {
+      if (error) log(error.message)
+    })
+
+    return true
+  } catch (error) {
+    return error.message
+  }
+}
+
+export { sendVerifyEmail, verifyCode, reSendVerifyEmail }
