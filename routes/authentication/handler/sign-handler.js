@@ -2,28 +2,11 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import "dotenv/config"
 import ResponseApi from "../../../js/api-response.js"
-import Database from "../../../js/dbMethod.js"
 import { sendVerifyEmail, verifyCode } from "../controller/verify-email.js"
 import { nanoid } from "nanoid"
 import NodeDeviceDecector from "node-device-detector"
 
-const user = new Database("account", {
-  _id: String,
-  name: {
-    type: String,
-    maxLength: 100,
-    index: true,
-    unique: true
-  },
-  email: {
-    type: String,
-    maxLength: 100,
-    index: true,
-    unique: true
-  },
-  pwd: String,
-  device: {}
-})
+import user from '../../db/user-db.js'
 
 const jwtSecretKey = process.env.JWT_SECRET_TOKEN
 const jwtSignToken = process.env.JWT_SIGN_TOKEN
