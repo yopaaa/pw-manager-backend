@@ -1,2 +1,3 @@
-npm instal
-npm instal -g pm2
+code .
+clear
+npm run start

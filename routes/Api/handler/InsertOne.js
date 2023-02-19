@@ -10,7 +10,7 @@ export default async function (req, res) {
       _id: nanoid(),
       data: { name, email, site, pwd, notes, category },
       tag: [name, email, site],
-      tag2: tag.split("#").filter((x) => x !== ""),
+      tag2: tag && tag.includes("#") ? tag.split("#").filter((x) => x !== "") : undefined,
       author: {
         _id: req.body.authentication._id
       }

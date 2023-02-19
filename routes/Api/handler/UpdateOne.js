@@ -21,7 +21,7 @@ export default async function (req, res) {
     "data.pwd": pwd,
     "data.notes": notes,
     "data.category": category,
-    tag2: tag ? tag.split("#").filter((x) => x !== "") : undefined
+    tag2: tag && tag.includes("#") ? tag.split("#").filter((x) => x !== "") : undefined
   }
 
   if (exists) {
