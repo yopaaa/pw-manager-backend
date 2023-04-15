@@ -35,10 +35,10 @@ Actions.post("/restore", function (req, res) {
             const DataRestore = JSON.parse(fs.readFileSync(`./data/${fileName}`))
 
             DataRestore.forEach((element) => {
-              let checkData = data.find(element.id)
+              const checkData = data.find(element.id)
 
               if (checkData.code) {
-                let keys = `${element.user_name} ${element.email} ${element.site} ${element.notes}`
+                const keys = `${element.user_name} ${element.email} ${element.site} ${element.notes}`
                 element.key = keys.toLowerCase()
 
                 data.create(element)

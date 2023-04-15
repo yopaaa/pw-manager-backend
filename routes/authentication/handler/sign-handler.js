@@ -10,7 +10,7 @@ import user from '../../db/user-db.js'
 
 const jwtSecretKey = process.env.JWT_SECRET_TOKEN
 const jwtSignToken = process.env.JWT_SIGN_TOKEN
-const maxAge = 5 * 60 * 60 * 1000
+const maxAge = Number(process.env.JWT_EXPIRE_AGE) * 60 * 1000
 const expiresIn = Date.now() + maxAge / 1000
 const DeviceDetector = new NodeDeviceDecector({
   clientIndexes: true,
