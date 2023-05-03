@@ -5,9 +5,12 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "node app.js",
-    "start": "nodemon app.js",
-    "build": "pm2 start app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "pm2": "pm2 start app.js",
+    "dockerBuild": "sudo docker build -t pw-backend .",
+    "dockerUp": "sudo docker-compose up",
+    "dockerRemove": "sudo docker-compose down -v --rmi all"
   },
   "nodemonConfig": {
     "ignore": [

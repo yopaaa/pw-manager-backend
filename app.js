@@ -12,12 +12,16 @@ import pw_v1 from "./routes/Api/pw_v1.js"
 import sign from "./routes/authentication/sign.js"
 import LogASCIIText from "./js/ASCIIArt.js"
 import ResponseApi from "./js/api-response.js"
-import log from "./js/log.js"
 
 // -----------------------------VARIABLE-----------------------------
 const app = express()
-const { MAIN_PORT, WHITE_LIST_CORS, FRONT_END_PATH } = process.env
+const { MAIN_PORT, WHITE_LIST_CORS = null } = process.env
 const origin = function (origin, callback) {
+  if (!WHITE_LIST_CORS) {
+    callback(null, true)
+    return
+  }
+
   if (WHITE_LIST_CORS.includes(origin)) {
     callback(null, true)
   } else {
@@ -48,8 +52,7 @@ app.all("/ping", authentication, async (req, res) => {
 // The default error handler
 app.use((err, req, res, next) => {
   const { message } = err
-  log(`${req.ip} access ${req.originalUrl} ${message}`, 503, req.method)
-  res.redirect(FRONT_END_PATH)
+  ResponseApi(req, res, 403, null, [message])
 })
 // 404
 app.use("/", (req, res) => {
