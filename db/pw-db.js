@@ -1,4 +1,4 @@
-import Database from "../../js/dbMethod.js"
+import Database from "../js/dbMethod.js"
 
 const pw = new Database("passwords", {
   _id: String,

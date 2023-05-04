@@ -1,5 +1,5 @@
 import ResponseApi from "../../../js/api-response.js"
-import pw from "../../db/pw-db.js"
+import pw from "../../../db/pw-db.js"
 import { nanoid } from "nanoid"
 
 export default async function (req, res) {

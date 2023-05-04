@@ -1,5 +1,5 @@
 import express from "express"
-import SignHandler from "./handler/sign-handler.js"
+import SignHandler from "./src/sign-handler.js"
 
 const sign = express.Router()
 

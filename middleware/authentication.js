@@ -1,4 +1,4 @@
-import ResponseApi from "../../js/api-response.js"
+import ResponseApi from "../js/api-response.js"
 import "dotenv/config"
 import jwt from "jsonwebtoken"
 

@@ -1,19 +1,15 @@
-// -----------------------------THIRD PARTY MODULE-----------------------------
 import express from "express"
 import cookieParser from "cookie-parser"
 import bodyParser from "body-parser"
 import cors from "cors"
 import "dotenv/config"
 
-// -----------------------------EXPORT IMPORT MODULE-----------------------------
-import authentication from "./routes/authentication/authentication.js"
-// import Actions from "./routes/Actions/data-actions.js"
+import authentication from "./middleware/authentication.js"
 import pw_v1 from "./routes/Api/pw_v1.js"
-import sign from "./routes/authentication/sign.js"
+import sign from "./routes/Sign/sign.js"
 import LogASCIIText from "./js/ASCIIArt.js"
 import ResponseApi from "./js/api-response.js"
 
-// -----------------------------VARIABLE-----------------------------
 const app = express()
 const { MAIN_PORT, WHITE_LIST_CORS = null } = process.env
 const origin = function (origin, callback) {
@@ -54,6 +50,7 @@ app.use((err, req, res, next) => {
   const { message } = err
   ResponseApi(req, res, 403, null, [message])
 })
+
 // 404
 app.use("/", (req, res) => {
   ResponseApi(req, res, 404)

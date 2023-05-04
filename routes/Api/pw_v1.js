@@ -2,14 +2,14 @@ import express from "express"
 import "dotenv/config"
 import ResponseApi from "../../js/api-response.js"
 
-import FindAll from "./handler/FindAll.js"
-import Search from "./handler/Search.js"
-import FindById from "./handler/FindById.js"
-import InsertOne from "./handler/InsertOne.js"
-import UpdateOne from "./handler/UpdateOne.js"
-import Delete from "./handler/Delete.js"
-import backup from './handler/actions/backup.js'
-import verify from './handler/actions/verify.js'
+import FindAll from "./src/FindAll.js"
+import Search from "./src/Search.js"
+import FindById from "./src/FindById.js"
+import InsertOne from "./src/InsertOne.js"
+import UpdateOne from "./src/UpdateOne.js"
+import Delete from "./src/Delete.js"
+import backup from './src/actions/backup.js'
+import verify from './src/actions/verify.js'
 
 const Api = express.Router()
 

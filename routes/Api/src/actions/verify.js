@@ -1,5 +1,5 @@
-import { sendVerifyEmail } from "../../../authentication/controller/verify-email.js"
-import user from "../../../db/user-db.js"
+import { sendVerifyEmail } from "../../../Sign/src/verify-email.js"
+import user from "../../../../db/user-db.js"
 import ResponseApi from "../../../../js/api-response.js"
 
 export default async function (req, res) {

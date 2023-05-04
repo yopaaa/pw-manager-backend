@@ -2,11 +2,11 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import "dotenv/config"
 import ResponseApi from "../../../js/api-response.js"
-import { sendVerifyEmail, verifyCode } from "../controller/verify-email.js"
+import { sendVerifyEmail, verifyCode } from "./verify-email.js"
 import { nanoid } from "nanoid"
 import NodeDeviceDecector from "node-device-detector"
 
-import user from '../../db/user-db.js'
+import user from '../../../db/user-db.js'
 
 const jwtSecretKey = process.env.JWT_SECRET_TOKEN
 const jwtSignToken = process.env.JWT_SIGN_TOKEN

@@ -1,4 +1,4 @@
-import Database from "../../js/dbMethod.js"
+import Database from "../js/dbMethod.js"
 
 const user = new Database("account", {
   _id: String,

@@ -3,7 +3,7 @@ import DB from "../../../js/dbMethod.js"
 import nodemailer from "nodemailer"
 import "dotenv/config"
 import log from "../../../js/log.js"
-import emailTemplate from "../view/emailTemplate.js"
+import emailTemplate from "../emailTemplate.js"
 
 const mailTransporter = nodemailer.createTransport(
   {
