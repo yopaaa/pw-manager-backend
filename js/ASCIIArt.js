@@ -23,6 +23,7 @@ const LogASCIIText = (text) => {
     console.log(`    Running on :  ${moment().format("llll")}
     You can now connect in on end point.
 
+    Environment     : ${process.env.NODE_ENV || "no set"}
     Local           : http://localhost:${port}
     On Your Network : http://${localIp}:${port}
     `)

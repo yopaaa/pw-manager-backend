@@ -11,9 +11,9 @@ import LogASCIIText from "./js/ASCIIArt.js"
 import ResponseApi from "./js/api-response.js"
 
 const app = express()
-const { MAIN_PORT, WHITE_LIST_CORS = null } = process.env
+const { MAIN_PORT, WHITE_LIST_CORS = null, NODE_ENV } = process.env
 const origin = function (origin, callback) {
-  if (!WHITE_LIST_CORS) {
+  if (NODE_ENV === "production") {
     callback(null, true)
     return
   }
@@ -21,19 +21,15 @@ const origin = function (origin, callback) {
   if (WHITE_LIST_CORS.includes(origin)) {
     callback(null, true)
   } else {
-    callback(new Error("Not allowed by CORS"), false)
+    callback(new Error(`${origin} Not allowed by CORS`), false)
   }
 }
 // const origin = '*'
 
-// -----------------------------MIDDLEWARE-----------------------------
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(cors({ origin, credentials: true }))
-
-// -----------------------------ROUTE-----------------------------
-// app.use("/actions", authentication, Actions)
 app.use("/pw_v1", authentication, pw_v1)
 app.use("/sign", sign)
 
@@ -56,7 +52,6 @@ app.use("/", (req, res) => {
   ResponseApi(req, res, 404)
 })
 
-// -----------------------------START SERVER-----------------------------
 app.listen(MAIN_PORT, "0.0.0.0", () => {
   LogASCIIText("RILL CUY")
 })
