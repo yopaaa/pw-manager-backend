@@ -4,7 +4,9 @@ import "dotenv/config"
 
 const { MONGODB_USER_NAME, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DATABASE } =
   process.env
-const mongoPath = `mongodb://${MONGODB_USER_NAME}:${MONGODB_PASSWORD}@${MONGODB_HOST}/${MONGODB_DATABASE}`
+// const mongoPath = `mongodb://${MONGODB_USER_NAME}:${MONGODB_PASSWORD}@${MONGODB_HOST}/${MONGODB_DATABASE}`
+const mongoPath = `mongodb+srv://${MONGODB_USER_NAME}:${MONGODB_PASSWORD}@${MONGODB_HOST}/${MONGODB_DATABASE}`
+
 
 mongoose
   .connect(mongoPath, {
