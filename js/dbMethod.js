@@ -27,14 +27,14 @@ class Database {
 
     const database = mongoose.model(collections, dbSchema)
     database.createCollection()
-    database.listIndexes((err, result) => {
-      if (err) return log(err.message, 500)
-      log(`${collections} list indexes ${result.length}`, 200)
-    })
-    database.count((err, result) => {
-      if (err) return log(err.message, 500)
-      log(`database ${collections} data count is = ${result}`, 200)
-    })
+    // database.listIndexes((err, result) => {
+    //   if (err) return log(err.message, 500)
+    //   log(`${collections} list indexes ${result.length}`, 200)
+    // })
+    // database.count((err, result) => {
+    //   if (err) return log(err.message, 500)
+    //   log(`database ${collections} data count is = ${database.countDocuments({})}`, 200)
+    // })
 
     this.Db = database
     this.DbSchema = dbSchema

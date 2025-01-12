@@ -102,7 +102,7 @@ const x = (code) => {
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
           <!-- LOGO -->
           <tr>
-            <td bgcolor="#FFA73B" align="center">
+            <td bgcolor="rgb(33 34 42)" align="center">
               <table
                 border="0"
                 cellpadding="0"
@@ -121,7 +121,7 @@ const x = (code) => {
             </td>
           </tr>
           <tr>
-            <td bgcolor="#FFA73B" align="center" style="padding: 0px 10px 0px 10px">
+            <td bgcolor="rgb(33 34 42)" align="center" style="padding: 0px 10px 0px 10px">
               <table
                 border="0"
                 cellpadding="0"
@@ -196,7 +196,7 @@ const x = (code) => {
                               <td
                                 align="center"
                                 style="border-radius: 3px"
-                                bgcolor="#FFA73B"
+                                bgcolor="rgb(33 34 42)"
                               >
                                 <a
                                   style="
@@ -261,7 +261,7 @@ const x = (code) => {
                       Need more help?
                     </h2>
                     <p style="margin: 0">
-                      <a href="#" target="_blank" style="color: #ffa73b"
+                      <a href="#" target="_blank" style="color: rgb(33 34 42)"
                         >We&rsquo;re here to help you out</a
                       >
                     </p>
@@ -309,8 +309,7 @@ const x = (code) => {
           </tr>
         </table>
       </body>
-    </html>
-    `
+    </html>`
 }
 
 export default x
